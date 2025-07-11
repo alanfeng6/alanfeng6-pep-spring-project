@@ -9,4 +9,6 @@ import com.example.entity.Message;
 
 public interface MessageRepository extends JpaRepository<Message, Long> {
     Optional<Message> findByMessageText(String messageText);
+    Optional<Message> findByMessageId(int messageId);
+    Optional<Message> deleteByMessageId(int messageId);
 }

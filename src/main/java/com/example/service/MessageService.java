@@ -1,5 +1,7 @@
 package com.example.service;
 
+import java.lang.StackWalker.Option;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,5 +37,51 @@ public class MessageService {
             return null;
         }
         return messageRepository.save(message);
+    }
+
+    public List<Message> getMessages() {
+        return messageRepository.findAll();
+    }
+
+    public Message messageById(int messageId) {
+        Optional<Message> message = messageRepository.findByMessageId(messageId);
+        if (message.isPresent()) {
+            return message.get();
+        }
+        return null;
+    }
+
+    public int deleteMessageById(int messageId) {
+        Optional<Message> message = messageRepository.findByMessageId(messageId);
+        if (message.isPresent()) {
+            messageRepository.delete(message.get());
+            return 1;
+        }
+        return 0;
+    }
+
+    public int updateMessageById(int messageId, Message replacementMessage) {
+        String messageText = replacementMessage.getMessageText();
+        if (messageText.length() == 0 || messageText.length() > 255) {
+            return 0;
+        }
+        Optional<Message> optionalMessage = messageRepository.findByMessageId(messageId);
+        if (!optionalMessage.isPresent()) {
+            return 0;
+        }
+        Message message = optionalMessage.get();
+        message.setMessageText(messageText);
+        messageRepository.save(message);
+        return 1;
+    }
+
+    public List<Message> getMessagesByAccountId(int accountId) {
+        List<Message> messagesList = messageRepository.findAll();
+        for (int i = messagesList.size() - 1; i >= 0; i--) {
+            if (messagesList.get(i).getPostedBy() != accountId) {
+                messagesList.remove(i);
+            }
+        }
+        return messagesList;
     }
 }

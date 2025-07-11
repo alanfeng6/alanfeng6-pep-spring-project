@@ -1,8 +1,13 @@
 package com.example.controller;
 
+import java.util.List;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -64,5 +69,41 @@ public class SocialMediaController {
         else {
             return ResponseEntity.status(400).body(null);
         }
+    }
+
+    @GetMapping("messages")
+    public @ResponseBody ResponseEntity<List<Message>> messages() {
+        List<Message> messagesList = messageService.getMessages();
+        return ResponseEntity.status(200).body(messagesList);
+    }
+
+    @GetMapping("messages/{messageId}")
+    public @ResponseBody ResponseEntity<Message> messageById(@PathVariable int messageId) {
+        Message message = messageService.messageById(messageId);
+        return ResponseEntity.status(200).body(message);
+    }
+
+    @DeleteMapping("messages/{messageId}")
+    public @ResponseBody ResponseEntity<Integer> deleteMessageById(@PathVariable int messageId) {
+        int rows = messageService.deleteMessageById(messageId);
+        if (rows == 0) {
+            return ResponseEntity.status(200).body(null);
+        }
+        return ResponseEntity.status(200).body(rows);
+    }
+
+    @PatchMapping("messages/{messageId}")
+    public @ResponseBody ResponseEntity<Integer> updateMessageById(@PathVariable int messageId, @RequestBody Message message) {
+        int rows = messageService.updateMessageById(messageId, message);
+        if (rows == 0) {
+            return ResponseEntity.status(400).body(null);
+        }
+        return ResponseEntity.status(200).body(rows);
+    }
+
+    @GetMapping("accounts/{accountId}/messages")
+    public @ResponseBody ResponseEntity<List<Message>> getMessagesByAccountId(@PathVariable int accountId) {
+        List<Message> messagesList = messageService.getMessagesByAccountId(accountId);
+        return ResponseEntity.status(200).body(messagesList);
     }
 }
